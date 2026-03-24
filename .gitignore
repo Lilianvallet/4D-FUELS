@@ -53,10 +53,5 @@ nsvb.R
 output_data/
 output_figure/
 report/
-data/WorkingFiles/
-data/CONUS_forestmasks/
-data/province2007/
-data/ExpandedStudyRegion/
-data/Ute_Pak_Fire/
-data/Study_Area_Figure/
+data/
 script/subscript/
