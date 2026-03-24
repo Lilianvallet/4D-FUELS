@@ -512,7 +512,7 @@ process.tile <- function(tile_id,process_cbh=F,forest_mask=T) {
       
       #Biomass ---------------------------------------------------------------
       Trees_Biomass <- Trees_Dbh
-      Ecoregions <- vect(paste0(project_dataP, "WorkingFiles/Eco_Division_t.gpkg")) #Read Ecoregion file
+      Ecoregions <- vect(paste0(project_dataP, "Biomass_data/Eco_Division_t.gpkg")) #Read Ecoregion file
       if (crs(Ecoregions) != crs(Trees_Biomass)) {
         Ecoregions <- terra::project(Ecoregions, crs(Trees_Biomass))#reproject Ecoregion if needed
       }
