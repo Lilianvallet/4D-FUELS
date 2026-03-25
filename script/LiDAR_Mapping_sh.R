@@ -53,11 +53,15 @@ outputP <- paste0(dataP) #Set a path to folder which will contains output
 output_campaignP <- paste0(outputP, roi, "/", campaign, "/", "output_data/") #Set a path to outputs of the LiDAR campaign
 output_campaign_mapP <- paste0(output_campaignP, "Map/") #Set a path to final maps of LiDAR campaign
 output_campaign_tilesP <- paste0(output_campaignP, "Tiles/") #Set a path to individual tiles of LiDAR campaign
+output_campaign_metadataP <- paste0(output_campaignP, "MetaData/") #Set a path to individual tiles of LiDAR campaign
+
 
 dir.create(outputP, showWarnings = F) #Create above-mentioned folder
 dir.create(output_campaignP, showWarnings = F) #Create above-mentioned folder
 dir.create(output_campaign_mapP, showWarnings = F) #Create above-mentioned folder
 dir.create(output_campaign_tilesP, showWarnings = F) #Create above-mentioned folder
+dir.create(output_campaign_metadataP, showWarnings = F) #Create above-mentioned folder
+
 
 # File listing and formatting
 LasFiles <- list.files(lasP, pattern = paste0(lidar_file_type,"$")) #List .las files
@@ -177,7 +181,7 @@ f <- c(paste0(lasP, TilesToDo, lidar_file_type),
 ans = lasR::exec(pipeline, on = f, ncores = concurrent_files(core_nb)) #Execute pipelines
 
 # Obtain Allometry relation ----------------------------------------------------
-CAMPAIGN_MAP <- map(list.files(output_campaign_tilesP, "sup2NB.tif$", full.names = T),
+CAMPAIGN_MAP <- map(list.files(output_campaign_tilesP, "sup2NB.tif$", full.names = T)[100:300],
             rast)#Read all tiles
 #If you want to get a gpkg file of the tile grid, uncomment this section :
 CAMPAIGN_TILES <- map(CAMPAIGN_MAP,function(data){
@@ -187,7 +191,7 @@ CAMPAIGN_TILES <- map(CAMPAIGN_MAP,function(data){
   return(Polygon)
 })
 Campaign_Tiles <- vect(svc(CAMPAIGN_TILES))
-writeVector(Campaign_Tiles,paste0(output_campaignP,"Campaign_Tiles_",roi,campaign,".gpkg"),overwrite=T)
+writeVector(Campaign_Tiles,paste0(output_campaign_metadataP,"Campaign_Tiles_",roi,campaign,".gpkg"),overwrite=T)
 Campaign_Map <- mosaic(
   sprc(CAMPAIGN_MAP),
   filename = paste0(output_campaign_mapP, roi, "_", campaign, "_sup2NB.tif"),
@@ -342,6 +346,9 @@ Nls_Coefs_Wide <- Valid_Models %>%
 
 # Join with dominant species
 Nls_Coefs_DominantBA <- left_join(Nls_Coefs_Wide, Dominant_Species_ForTypGrp, by = "ForTypGrp")
+
+# Write Coefficient as a file
+write.csv(Nls_Coefs_DominantBA,paste0(output_campaign_metadataP,"Nls_Coefs_",roi,campaign,".csv"))
 
 # Declare Function for forest attribute extraction -----------------------------
 ForestAttributes <- c(
